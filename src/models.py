@@ -8,90 +8,143 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class People(Base):
-    __tablename__ = 'people'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250))
-    url = Column(String(250))
+class Fav_Planets(Base):
+    __tablename__ = 'fav_planets'
 
-class Planets(Base):
-    __tablename__ = 'planets'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    planet_id = Column(Integer, ForeignKey('planet.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "planet_id": self.planet_id
+        }
+
+class Fav_People(Base):
+    __tablename__ = 'fav_people'
     # Here we define columns for the table address.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250)) 
-    url = Column(String(250))
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    people_id = Column(Integer, ForeignKey('people.id'), nullable=False)
 
-class Details_of_People(Base):
-    __tablename__ = 'details_of_people'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "people_id": self.people_id
+        }
+
+class Detail_of_Planet(Base):
+    __tablename__ = 'planet'
+    
+    id = Column(Integer, primary_key=True)
+    diameter = Column(Integer)
+    rotation_period = Column(Integer)
+    orbital_period = Column(Integer)
+    gravity = Column(String)
+    population = Column(Integer)
+    climate = Column(String)
+    terrain = Column(String)
+    surface_water = Column(Integer)
+    created = Column(Date)
+    edited = Column(Date)
+    name = Column(String) 
+    url = Column(String)
+    description = Column(String)
+    photo = Column(String)
+    liked_by_users = relationship("Planet_Fav", backref="planet")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "diameter": self.diameter,
+            "rotation_period": self.rotation_period,
+            "orbital_period": self.orbital_period,
+            "gravity": self.gravity,
+            "population": self.population,
+            "climate": self.climate,
+            "terrain": self.terrain,
+            "surface_water": self.surface_water,
+            "created": self.created,
+            "edited": self.edited,
+            "name": self.name,
+            "url": self.url,
+            "description": self.description,
+            "photo": self.photo,
+        }
+
+
+    
+class Detail_of_People(Base):
+    __tablename__ = 'people'
+    
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
     mass = Column(Integer)
     hair_color = Column(String)
     skin_color = Column(String)
     eye_color = Column(String)
+    birth_year = Column(Date)
     gender = Column(String)
-    created = Column(Date)
-    edited = Column(Date)
-    name =  Column(String)
-    homeworld =  Column(String)
-    url =  Column(String)
-    description =  Column(String)
-    photo = Column(String)
-    people_id = Column(Integer, ForeignKey('people.id'))
-    people = relationship(People)
-    
-    
-class Details_of_Planets(Base):
-    __tablename__ = 'details_of_planets'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    diameter = Column(Integer)
-    rotation_period = Column(Integer)
-    orbit_period = Column(Integer)
-    gravity = Column(Integer)
-    population = Column(Integer)
-    climate = Column(String)
-    surface_water = Column(Integer)
+    birth_year = Column(Date)
     created = Column(Date)
     edited = Column(Date)
     name = Column(String)
+    homeworld = Column(String)
     url = Column(String)
     description = Column(String)
-    photo =  Column(String)
-    planets_id = Column(Integer, ForeignKey('planets.id'))
-    planets = relationship(Planets)
+    photo = Column(String)
+    liked_by_users = relationship("People_Fav", backref="people")
 
-class User_info(Base):
-    __tablename__ = 'user_info'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+    def serialize(self):
+        return {
+            "id": self.id,
+            "height": self.height,
+            "mass": self.mass,
+            "hair_color": self.hair_color,
+            "skin_color": self.skin_color,
+            "eye_color": self.eye_color,
+            "birth_year": self.birth_year,
+            "created": self.created,
+            "edited": self.edited,
+            "name": self.name,
+            "homeworld": self.homeworld,
+            "url": self.url,
+            "description": self.description,
+            "photo": self.photo
+        }
+
+class User_Info(Base):
+    __tablename__ = 'user'
+    
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
-    email = Column(String(250), nullable=False)
-    profile_photo  = Column(String(250), nullable=False)
-    
+    email = Column(String(250), nullable=False, unique=True)
+    password = Column(String(250), nullable=False)
+    profile_photo = Column(String(250))
+    favourite_planets = relationship("Planet_Fav", backref="user")
+    favourite_people = relationship("People_Fav", backref="user")
 
-class Favourites(Base):
-    __tablename__ = 'favourites'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    planets_id = Column(Integer, ForeignKey('planets.id'))
-    planets = relationship(Planets)
-    people_id = Column(Integer, ForeignKey('people.id'))
-    people = relationship(People)
-    user_info_id = Column(Integer, ForeignKey('user_info.id'))
-    user_info = relationship(User_info)
-    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "profile_photo": self.profile_photo
+        }
 
-    def to_dict(self):
-        return {}
 
 ## Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
+    
+
+    #def __repr__(self):
+    #    return '<User_Info %r>' % self.username
+    #def to_dict(self):
+     ##   return {}
+
+## Draw from SQLAlchemy base
+#render_er(Base, 'diagram.png')2
